@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-deployment
+  namespace: devops
+  labels:
+    app: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      serviceAccountName: jenkins-admin
+      containers:
+        - name: jenkins
+          image: jenkins/jenkins:2.361.1-lts-jdk11
+          imagePullPolicy: Never
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          ports:
+            - name: httpport
+              containerPort: 8080
+              protocol: TCP
+            - name: jnlpport
+              containerPort: 50000
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 20Gi
+            requests:
+              cpu: 500m
+              memory: 20Gi
+          env:
+            - name: JENKINS_OPTS
+              value: "Djenkins.model.Jenkins.logStartupPerformance=true"
+            - name: JAVA_OPTS
+              value: "-Xmx16g -Xms9g -XX:NewSize=512m -XX:MaxNewSize=512m -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/logs/ -XX:+UseG1GC -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:+DisableExplicitGC -XX:+UnlockDiagnosticVMOptions -XX:+UnlockExperimentalVMOptions -Xlog:gc*,gc+heap=trace,gc+age*=trace,gc+ref*=trace,gc+ergo*=trace:file=/logs/gc-%t.log:utctime:filecount=2,filesize=10m -XX:ErrorFile=/logs/hs_err_%p.log -XX:+LogVMOutput -XX:LogFile=/logs/hs_%p.log"
+          volumeMounts:
+            - name: jenkins-volume-storage
+              mountPath: /var/jenkins_home
+              subPath: data
+            - name: jenkins-volume-storage
+              mountPath: /logs
+              subPath: logs
+      volumes:
+        - name: jenkins-volume-storage
+          persistentVolumeClaim:
+            claimName: jenkins-volume-claim
