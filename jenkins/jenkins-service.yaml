@@ -7,10 +7,14 @@ spec:
   selector:
     app: jenkins
   ports:
-    - name: jenkins-ui
+    - name: jenkins-http
       protocol: TCP
-      port: 6666
+      port: 80
       targetPort: 8080
+    - name: jenkins-https
+      protocol: TCP
+      port: 443
+      targetPort: 8443
     - name: jenkins-slave
       port: 50000
       protocol: TCP

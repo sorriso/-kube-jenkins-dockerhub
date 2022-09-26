@@ -12,9 +12,9 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: HostSNI(`nexus.kube.local`)
+    - match: HostSNI(`jenkins.kube.local`)
       services:
         - name: jenkins-nginx-service
-          port: 8888
+          port: 443
   tls:
     passthrough: true

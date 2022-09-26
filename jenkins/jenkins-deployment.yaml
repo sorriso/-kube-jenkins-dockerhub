@@ -24,11 +24,30 @@ spec:
             runAsUser: 1000
             runAsGroup: 1000
           ports:
-            - name: httpport
+            - name: http-port
               containerPort: 8080
+              protocol: TCP
+            - name: https-port
+              containerPort: 8443
               protocol: TCP
             - name: jnlpport
               containerPort: 50000
+          livenessProbe:
+            httpGet:
+              path: "/login"
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: "/login"
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           resources:
             limits:
               cpu: 2000m

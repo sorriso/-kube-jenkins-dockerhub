@@ -7,4 +7,3 @@
 *.pem
 *.csr
 *.crt
-cluster-keys.json
