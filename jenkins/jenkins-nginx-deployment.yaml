@@ -20,14 +20,14 @@ spec:
         image: nginx:1.23.1-alpine
         imagePullPolicy: Never
         ports:
-          - containerPort: 9999
+          - containerPort: 80
             protocol: TCP
-          - containerPort: 8888
+          - containerPort: 443
             protocol: TCP
         resources:
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 256Mi
           requests:
             cpu: 10m
             memory: 128Mi
@@ -38,10 +38,22 @@ spec:
           - name: application-configuration
             mountPath: /etc/nginx/nginx.d/app.conf
             subPath: APP_CONF_KEY
+          - name: application-cert-key
+            mountPath: /etc/nginx/ssl/cert-ext.key
+            subPath: APP_CERT_KEY
+          - name: application-cert-pem
+            mountPath: /etc/nginx/ssl/cert-ext.pem
+            subPath: APP_CERT_PEM
       volumes:
         - name: nginx-configuration
           secret:
             secretName: jenkins-nginx-secret
         - name: application-configuration
+          secret:
+            secretName: jenkins-nginx-secret
+        - name: application-cert-key
+          secret:
+            secretName: jenkins-nginx-secret
+        - name: application-cert-pem
           secret:
             secretName: jenkins-nginx-secret
